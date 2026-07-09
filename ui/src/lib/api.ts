@@ -1,6 +1,9 @@
 import { loadToken } from "./auth";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3000";
+// Empty base - all API calls use relative paths so Next.js rewrites
+// (next.config.js) can proxy them to the Rust API transparently,
+// both in development and production.
+const API_BASE = "";
 
 function getToken() {
   return loadToken();
