@@ -1,0 +1,52 @@
+@import "tailwindcss";
+
+@theme {
+  /* Exact production color palette from rustfinity.com */
+  --color-bg:           #0d0f12;
+  --color-surface:      #14171c;
+  --color-surface-2:    #1a1e24;
+  --color-border:       #1f242c;
+  --color-border-strong:#2a313b;
+  --color-ink:          #e8ecf1;
+  --color-ink-dim:      #9aa3b0;
+  --color-ink-faint:    #5d6675;
+  --color-accent:       #d97757;
+  --color-accent-soft:  #d977571f;
+  --color-accent-line:  #d977574d;
+  --color-green:        #7dd3a0;
+  --color-code-bg:      #0a0c0f;
+  --font-sans: "Geist", "Inter", system-ui, sans-serif;
+  --font-mono: "Geist Mono", "JetBrains Mono", "Fira Code", ui-monospace, monospace;
+}
+
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+  html {
+    background: #0d0f12;
+    color: #e8ecf1;
+  }
+  body {
+    font-family: var(--font-sans);
+    background: #0d0f12;
+    color: #e8ecf1;
+    margin: 0;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #2a313b;
+    border-radius: 4px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #3a424f;
+  }
+}
