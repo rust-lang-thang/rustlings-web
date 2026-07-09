@@ -1,0 +1,12 @@
+{
+  "name": "rustlings-web",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "ui"
+  ],
+  "scripts": {
+    "dev:ui": "npm run dev --workspace=ui",
+    "build:ui": "npm run build --workspace=ui"
+  }
+}
