@@ -17,6 +17,11 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Rustlings (Web mode)",
   description: "Small exercises to get you used to reading and writing Rust",
+  icons: {
+    icon: "/images/rustlings/mascots/disguised-rust.svg",
+    shortcut: "/images/rustlings/mascots/disguised-rust.svg",
+    apple: "/images/rustlings/mascots/disguised-rust.svg",
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
