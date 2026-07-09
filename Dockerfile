@@ -41,6 +41,22 @@ COPY --from=ui-builder /app/ui/public               ./ui/public
 
 RUN mkdir -p /data
 
+# Pre-warm the shared cargo target directory so the very first user request
+# after a deploy does not pay the full cold-compilation cost.
+# We build both a `bin` and a `lib` stub that match the exact Cargo.toml
+# template used by runner.rs (same package name / edition), so cargo can
+# reuse the incremental artefacts for real exercises.
+ENV CARGO_TARGET_DIR=/app/cargo-target
+RUN mkdir -p /tmp/warmup/src && \
+    printf '[package]\nname = "rustlings_exercise"\nversion = "0.1.0"\nedition = "2021"\n' \
+        > /tmp/warmup/Cargo.toml && \
+    printf 'fn main() {}\n' > /tmp/warmup/src/main.rs && \
+    cargo build --manifest-path /tmp/warmup/Cargo.toml && \
+    printf '#[cfg(test)]\nmod tests {\n    #[test]\n    fn warmup() {}\n}\n' \
+        > /tmp/warmup/src/lib.rs && \
+    cargo test --manifest-path /tmp/warmup/Cargo.toml --no-run && \
+    rm -rf /tmp/warmup
+
 ENV DATABASE_URL=sqlite:/data/rustlings.db
 # API_BASE_URL is used by Next.js rewrites to reach the Rust API internally
 ENV API_BASE_URL=http://localhost:3000

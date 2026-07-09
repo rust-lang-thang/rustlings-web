@@ -1,3 +1,5 @@
+use std::time::Duration;
+
 use axum::{
     extract::{Path, State},
     http::{HeaderMap, StatusCode},
@@ -11,6 +13,9 @@ use crate::models::{
     RunRequest, RunResponse, UserProgress,
 };
 use crate::runner;
+use crate::state::AppState;
+
+const RUN_TIMEOUT: Duration = Duration::from_secs(30);
 
 pub async fn list_categories(
     State(pool): State<SqlitePool>,
@@ -118,7 +123,7 @@ pub async fn get_category(
 }
 
 pub async fn run_code(
-    State(pool): State<SqlitePool>,
+    State(state): State<AppState>,
     headers: HeaderMap,
     Json(body): Json<RunRequest>,
 ) -> Result<Json<RunResponse>, (StatusCode, String)> {
@@ -131,7 +136,7 @@ pub async fn run_code(
          FROM exercises WHERE id = ?",
     )
         .bind(&body.exercise_id)
-        .fetch_optional(&pool)
+        .fetch_optional(&state.pool)
         .await
         .map_err(|e| (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()))?
         .ok_or((StatusCode::NOT_FOUND, "Exercise not found".to_string()))?;
@@ -146,9 +151,25 @@ pub async fn run_code(
     let code = String::from_utf8(decoded_code)
         .map_err(|e| (StatusCode::BAD_REQUEST, format!("Invalid UTF-8: {}", e)))?;
 
-    // Run the code
-    let result = runner::run_code(&code, exercise.requires_test)
+    // Acquire a semaphore permit before spawning a cargo process.
+    // This caps concurrent compilations at MAX_CONCURRENT_RUNS so the VM
+    // does not OOM under simultaneous requests.
+    let _permit = state
+        .run_semaphore
+        .acquire()
         .await
+        .map_err(|e| (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()))?;
+
+    // Run the code with a hard timeout so infinite loops do not hold a
+    // semaphore permit or a CPU core forever.
+    let result = tokio::time::timeout(RUN_TIMEOUT, runner::run_code(&code, exercise.requires_test))
+        .await
+        .map_err(|_| {
+            (
+                StatusCode::REQUEST_TIMEOUT,
+                "Execution timed out after 30 seconds".to_string(),
+            )
+        })?
         .map_err(|e| (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()))?;
 
     // If successful, mark as completed and save code
@@ -162,7 +183,7 @@ pub async fn run_code(
         .bind(&user_id)
         .bind(&body.exercise_id)
         .bind(&code)
-        .execute(&pool)
+        .execute(&state.pool)
         .await
         .map_err(|e| (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()))?;
     } else {
@@ -176,7 +197,7 @@ pub async fn run_code(
         .bind(&user_id)
         .bind(&body.exercise_id)
         .bind(&code)
-        .execute(&pool)
+        .execute(&state.pool)
         .await
         .map_err(|e| (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()))?;
     }

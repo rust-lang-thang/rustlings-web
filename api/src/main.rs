@@ -4,6 +4,7 @@ mod github;
 mod handlers;
 mod models;
 mod runner;
+mod state;
 mod sync;
 
 use axum::{
@@ -34,6 +35,8 @@ async fn main() {
             }
         }
         Some("serve") | None => {
+            let app_state = state::AppState::new(pool);
+
             let app = Router::new()
                 .route("/auth/register", post(handlers::auth::register))
                 .route("/auth/login", post(handlers::auth::login))
@@ -50,7 +53,7 @@ async fn main() {
                 .route("/rustlings/run", post(handlers::rustlings::run_code))
                 .layer(middleware::from_fn(auth::auth_middleware))
                 .layer(CorsLayer::permissive())
-                .with_state(pool);
+                .with_state(app_state);
 
             let listener = tokio::net::TcpListener::bind("0.0.0.0:3000")
                 .await
