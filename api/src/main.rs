@@ -8,17 +8,20 @@ mod sync;
 
 use axum::{
     middleware,
+    response::Redirect,
     routing::{get, post},
     Router,
 };
-use tower_http::cors::CorsLayer;
+use tower_http::{cors::CorsLayer, services::ServeDir};
 
 #[tokio::main]
 async fn main() {
     let args: Vec<String> = std::env::args().collect();
     let command = args.get(1).map(|s| s.as_str());
 
-    let pool = db::init_pool("sqlite:rustlings.db").await;
+    let db_url = std::env::var("DATABASE_URL")
+        .unwrap_or_else(|_| "sqlite:rustlings.db".to_string());
+    let pool = db::init_pool(&db_url).await;
 
     match command {
         Some("sync") => {
@@ -32,11 +35,14 @@ async fn main() {
             }
         }
         Some("serve") | None => {
-            let app = Router::new()
-                // Auth routes (no auth required)
+            let ui_dir = std::env::var("UI_DIR")
+                .unwrap_or_else(|_| "./ui/out".to_string());
+
+            // API routes with auth middleware - auth layer only wraps these,
+            // not the static file fallback, so the UI loads without a token.
+            let api_router = Router::new()
                 .route("/auth/register", post(handlers::auth::register))
                 .route("/auth/login", post(handlers::auth::login))
-                // Protected routes
                 .route("/user/me", get(handlers::user::me))
                 .route("/user/change-password", post(handlers::auth::change_password))
                 .route(
@@ -49,8 +55,13 @@ async fn main() {
                 )
                 .route("/rustlings/run", post(handlers::rustlings::run_code))
                 .layer(middleware::from_fn(auth::auth_middleware))
-                .layer(CorsLayer::permissive())
                 .with_state(pool);
+
+            let app = Router::new()
+                .route("/", get(|| async { Redirect::temporary("/rustlings/") }))
+                .merge(api_router)
+                .fallback_service(tower_http::services::ServeDir::new(ui_dir))
+                .layer(CorsLayer::permissive());
 
             let listener = tokio::net::TcpListener::bind("0.0.0.0:3000")
                 .await

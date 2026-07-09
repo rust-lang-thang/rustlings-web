@@ -1,18 +1,14 @@
-# fly.toml app configuration file generated for rustlings-api on 2026-07-09T07:24:43Z
-#
-# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
-#
-
 app = 'rustlings-api'
 primary_region = 'iad'
 
 [build]
 
 [env]
-  PORT = '8080'
+  DATABASE_URL = 'sqlite:/data/rustlings.db'
+  UI_DIR = '/app/ui/out'
 
 [http_service]
-  internal_port = 8080
+  internal_port = 3000
   force_https = true
   auto_stop_machines = 'stop'
   auto_start_machines = true
@@ -23,4 +19,7 @@ primary_region = 'iad'
   memory = '1gb'
   cpu_kind = 'shared'
   cpus = 1
-  memory_mb = 256
+
+[mounts]
+  source = 'rustlings_data'
+  destination = '/data'
