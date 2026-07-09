@@ -32,9 +32,12 @@ WORKDIR /app
 COPY --from=api-builder /app/target/release/rustlings_api .
 
 # Next.js standalone bundle
-COPY --from=ui-builder /app/ui/.next/standalone ./ui/
-COPY --from=ui-builder /app/ui/.next/static     ./ui/.next/static
-COPY --from=ui-builder /app/ui/public           ./ui/public
+# In a monorepo, Next.js nests the output under the package directory.
+# standalone/ contains ui/server.js (not server.js at the root).
+# Copying standalone/ to /app puts server.js at /app/ui/server.js.
+COPY --from=ui-builder /app/ui/.next/standalone/    ./
+COPY --from=ui-builder /app/ui/.next/static         ./ui/.next/static
+COPY --from=ui-builder /app/ui/public               ./ui/public
 
 RUN mkdir -p /data
 
