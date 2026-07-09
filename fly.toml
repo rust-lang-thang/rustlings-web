@@ -1,4 +1,4 @@
-app = 'rustlings-api'
+app = 'rustlings-web'
 primary_region = 'iad'
 
 [build]
