@@ -254,33 +254,13 @@ export default function RustlingsPage() {
             className="flex items-baseline gap-1"
             style={{ fontFamily: C.mono, fontSize: "28px", fontWeight: 600, color: C.ink }}
           >
-            0
+            {me?.streak.current_streak ?? 0}
             <small style={{ fontSize: "11px", fontWeight: 400, letterSpacing: ".08em", color: C.inkFaint }}>
               days
             </small>
           </div>
-          {/* Streak grid - 28 cells, 2 rows × 14 cols */}
-          <div
-            className="mt-3"
-            style={{ display: "grid", gridTemplateColumns: "repeat(14, 1fr)", gap: "2px" }}
-          >
-            {Array.from({ length: 27 }).map((_, i) => (
-              <span
-                key={i}
-                style={{ background: C.border, borderRadius: "1.5px", height: "10px", display: "block" }}
-              />
-            ))}
-            {/* Today */}
-            <span
-              style={{
-                background: C.accent,
-                borderRadius: "1.5px",
-                height: "10px",
-                display: "block",
-                boxShadow: `0 0 0 1px ${C.accentLine}`,
-              }}
-            />
-          </div>
+          {/* Streak grid - 28 cells, 2 rows × 14 cols, oldest top-left → newest bottom-right */}
+          <StreakGrid activeDays={me?.streak.active_days ?? []} />
         </div>
 
         {/* Continue where left off */}
@@ -373,6 +353,50 @@ function StatBadge({
       >
         {label}
       </div>
+    </div>
+  );
+}
+
+function StreakGrid({ activeDays }: { activeDays: string[] }) {
+  const activeSet = new Set(activeDays);
+
+  // Build an array of the last 28 calendar dates, oldest first.
+  const today = new Date();
+  const days: { dateStr: string; isToday: boolean }[] = [];
+  for (let i = 27; i >= 0; i--) {
+    const d = new Date(today);
+    d.setDate(today.getDate() - i);
+    const dateStr = d.toISOString().slice(0, 10); // "YYYY-MM-DD"
+    days.push({ dateStr, isToday: i === 0 });
+  }
+
+  return (
+    <div
+      className="mt-3"
+      style={{ display: "grid", gridTemplateColumns: "repeat(14, 1fr)", gap: "2px" }}
+    >
+      {days.map(({ dateStr, isToday }) => {
+        const active = activeSet.has(dateStr);
+        return (
+          <span
+            key={dateStr}
+            title={dateStr}
+            style={{
+              background: active
+                ? isToday
+                  ? "#d97757"      // today + active: full accent
+                  : "#d977578a"    // past active: softer accent
+                : isToday
+                  ? "#2a313b"      // today, no activity yet: stronger border hint
+                  : "#1f242c",     // inactive
+              borderRadius: "1.5px",
+              height: "10px",
+              display: "block",
+              boxShadow: isToday ? "0 0 0 1px #d977574d" : undefined,
+            }}
+          />
+        );
+      })}
     </div>
   );
 }

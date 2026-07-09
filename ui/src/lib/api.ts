@@ -58,9 +58,19 @@ export interface ProgressStats {
   percentage: number;
 }
 
+export interface StreakStats {
+  current_streak: number;
+  longest_streak: number;
+  total_active_days: number;
+  start_date: string | null;
+  /** All "YYYY-MM-DD" dates on which the user completed at least one exercise. */
+  active_days: string[];
+}
+
 export interface MeResponse {
   user: { id: string; username: string; name: string | null; avatar: string | null };
   rustlings_progress: ProgressStats;
+  streak: StreakStats;
 }
 
 export interface RunResponse {

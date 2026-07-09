@@ -99,9 +99,21 @@ impl From<&User> for UserResponse {
 }
 
 #[derive(Debug, Serialize)]
+pub struct StreakStats {
+    pub current_streak: i64,
+    pub longest_streak: i64,
+    pub total_active_days: i64,
+    pub start_date: Option<String>,
+    /// All dates ("YYYY-MM-DD") on which the user completed at least one exercise.
+    /// Used by the frontend to render the activity grid.
+    pub active_days: Vec<String>,
+}
+
+#[derive(Debug, Serialize)]
 pub struct MeResponse {
     pub user: UserResponse,
     pub rustlings_progress: ProgressStats,
+    pub streak: StreakStats,
 }
 
 #[derive(Debug, Serialize)]
