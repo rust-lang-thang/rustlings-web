@@ -6,6 +6,7 @@ node_modules/
 
 # Next.js
 ui/.next/
+ui/tsconfig.tsbuildinfo
 
 # Environment - never commit real secrets
 .env.local

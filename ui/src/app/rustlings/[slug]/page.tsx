@@ -1,7 +1,9 @@
 "use client";
 import { useState, useEffect, use } from "react";
 import Link from "next/link";
-import { api, type CategoryDetail } from "@/lib/api";
+import Image from "next/image";
+import { api, type CategoryDetail, type CategoryListItem } from "@/lib/api";
+import { ASSETS } from "@/lib/assets";
 import Sidebar from "@/components/Sidebar";
 import ExerciseCard from "@/components/ExerciseCard";
 
@@ -31,17 +33,22 @@ export default function CategoryPage({
   const [category, setCategory] = useState<CategoryDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [allCategories, setAllCategories] = useState<CategoryListItem[]>([]);
 
-  const load = () => {
-    setLoading(true);
+  const load = (showLoader = true) => {
+    if (showLoader) setLoading(true);
     api
       .category(slug)
       .then((data) => { setCategory(data); setError(null); })
       .catch((e: Error) => setError(e.message))
-      .finally(() => setLoading(false));
+      .finally(() => { if (showLoader) setLoading(false); });
   };
 
-  useEffect(() => { load(); }, [slug]);
+  useEffect(() => { load(true); }, [slug]);
+
+  useEffect(() => {
+    api.categories().then(setAllCategories).catch(() => {});
+  }, []);
 
   if (loading) {
     return (
@@ -75,6 +82,9 @@ export default function CategoryPage({
   const toGo = total - completed;
   const num = String(category.order_index).padStart(2, "0");
   const nextExercise = category.exercises.find((e) => !e.completed);
+  const nextCategory = allCategories.find(
+    (c) => c.order_index === category.order_index + 1
+  ) ?? null;
 
   return (
     <div className="flex min-h-screen" style={{ background: C.bg }}>
@@ -164,7 +174,27 @@ export default function CategoryPage({
                     ▶ continue · {nextExercise.name}
                   </a>
                 )}
-                {!nextExercise && completed > 0 && (
+                {!nextExercise && completed > 0 && nextCategory && (
+                  <Link
+                    href={`/rustlings/${nextCategory.slug}`}
+                    style={{
+                      display: "inline-flex", alignItems: "center", gap: "10px",
+                      background: C.greenSoft,
+                      border: `1px solid ${C.green}4d`,
+                      color: C.green,
+                      fontFamily: C.mono, fontSize: "11.5px", fontWeight: 600,
+                      borderRadius: "5px", padding: "8px 14px",
+                      textDecoration: "none",
+                    }}
+                    onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = `${C.green}33`; }}
+                    onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = C.greenSoft; }}
+                  >
+                    <Image src={ASSETS.rustlings.mascots.party} width={20} height={20} alt="" unoptimized />
+                    next · {nextCategory.name}
+                    <span style={{ opacity: 0.7 }}>→</span>
+                  </Link>
+                )}
+                {!nextExercise && completed > 0 && !nextCategory && (
                   <span style={{ fontFamily: C.mono, fontSize: "11px", color: C.green }}>
                     ✓ all exercises complete
                   </span>
@@ -212,7 +242,7 @@ export default function CategoryPage({
 
               {/* Exercise list */}
               {category.exercises.map((ex) => (
-                <ExerciseCard key={ex.id} exercise={ex} onCompleted={load} />
+                <ExerciseCard key={ex.id} exercise={ex} onCompleted={() => load(false)} />
               ))}
             </div>
           </div>
