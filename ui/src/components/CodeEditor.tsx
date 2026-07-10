@@ -346,6 +346,7 @@ export default function CodeEditor({
 }: Props) {
   const editorRef = useRef<any>(null);
   const monacoRef = useRef<any>(null);
+  const lastInternalValueRef = useRef(value);
 
   // Called before the editor DOM node is created - perfect for defining themes
   const handleBeforeMount = useCallback((monaco: any) => {
@@ -357,6 +358,24 @@ export default function CodeEditor({
     editorRef.current = editor;
     monacoRef.current = monaco;
   }, []);
+
+  const handleChange = useCallback((v: string | undefined) => {
+    const nextValue = v ?? "";
+    lastInternalValueRef.current = nextValue;
+    onChange?.(nextValue);
+  }, [onChange]);
+
+  // Keep Monaco fast while typing by avoiding controlled model updates.
+  // External changes, such as reset or a new exercise, still replace the model.
+  useEffect(() => {
+    const editor = editorRef.current;
+    if (!editor || lastInternalValueRef.current === value) return;
+    const model = editor.getModel();
+    if (!model || model.getValue() === value) return;
+
+    editor.setValue(value);
+    lastInternalValueRef.current = value;
+  }, [value]);
 
   // Push diagnostic markers into the editor model whenever they change
   useEffect(() => {
@@ -386,12 +405,13 @@ export default function CodeEditor({
   }, [markers]);
 
   return (
+    <div style={{ overscrollBehavior: "contain" }}>
     <MonacoEditor
       height={height}
       language="rust"
       theme="rustlings-dark"
-      value={value}
-      onChange={(v: string | undefined) => onChange?.(v ?? "")}
+      defaultValue={value}
+      onChange={handleChange}
       beforeMount={handleBeforeMount}
       onMount={handleMount}
       options={{
@@ -408,6 +428,7 @@ export default function CodeEditor({
         overviewRulerBorder: false,
         hideCursorInOverviewRuler: true,
         scrollbar: {
+          alwaysConsumeMouseWheel: true,
           verticalScrollbarSize: 6,
           horizontalScrollbarSize: 6,
         },
@@ -452,5 +473,6 @@ export default function CodeEditor({
         hover: { enabled: true, delay: 300 },
       }}
     />
+    </div>
   );
 }
