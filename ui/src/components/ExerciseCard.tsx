@@ -75,6 +75,8 @@ const C = {
   green:    "#7dd3a0",
   greenSoft: "#7dd3a01f",
   codeBg:   "#0a0c0f",
+  noteBg:   "#17130f",
+  noteBorder: "#7a523640",
   mono:     "var(--font-geist-mono, 'Geist Mono', ui-monospace, monospace)",
 } as const;
 
@@ -245,11 +247,11 @@ export default function ExerciseCard({ exercise, onCompleted }: Props) {
 
       {/* Hint panel */}
       {showHint && exercise.hint && (
-        <div style={{ borderTop: `1px solid ${C.border}`, background: C.surface2 }}>
-          <div style={{ padding: "10px 14px 4px", fontFamily: C.mono, fontSize: "9.5px", letterSpacing: ".16em", textTransform: "uppercase", color: C.inkFaint }}>
+        <div style={{ borderTop: `1px solid ${C.noteBorder}`, background: C.noteBg }}>
+          <div style={{ padding: "10px 14px 4px", fontFamily: C.mono, fontSize: "9.5px", letterSpacing: ".16em", textTransform: "uppercase", color: C.accent }}>
             hint
           </div>
-          <pre style={{ padding: "0 14px 12px", fontSize: "12px", color: C.inkDim, fontFamily: C.mono, whiteSpace: "pre-wrap", margin: 0 }}>
+          <pre style={{ padding: "0 14px 12px", fontSize: "12px", color: C.inkDim, fontFamily: C.mono, whiteSpace: "pre-wrap", margin: 0, userSelect: "text" }}>
             {exercise.hint}
           </pre>
         </div>
@@ -257,12 +259,25 @@ export default function ExerciseCard({ exercise, onCompleted }: Props) {
 
       {/* Solution panel */}
       {showSolution && (
-        <div style={{ borderTop: `1px solid ${C.border}` }}>
-          <div style={{ padding: "10px 14px 4px", fontFamily: C.mono, fontSize: "9.5px", letterSpacing: ".16em", textTransform: "uppercase", color: C.inkFaint }}>
+        <div style={{ borderTop: `1px solid ${C.noteBorder}`, background: C.noteBg }}>
+          <div style={{ padding: "10px 14px 4px", fontFamily: C.mono, fontSize: "9.5px", letterSpacing: ".16em", textTransform: "uppercase", color: C.accent }}>
             solution
           </div>
           {exercise.solution ? (
-            <CodeEditor value={exercise.solution} readOnly height="320px" />
+            <pre style={{
+              margin: 0,
+              padding: "0 14px 14px",
+              maxHeight: "320px",
+              overflow: "auto",
+              fontFamily: C.mono,
+              fontSize: "12px",
+              lineHeight: 1.7,
+              color: C.inkDim,
+              whiteSpace: "pre",
+              userSelect: "text",
+            }}>
+              {exercise.solution}
+            </pre>
           ) : (
             <div style={{ padding: "0 14px 12px", fontFamily: C.mono, fontSize: "11px", color: C.inkFaint }}>
               No solution available for this exercise.

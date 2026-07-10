@@ -174,31 +174,6 @@ export default function CategoryPage({
                     ▶ continue · {nextExercise.name}
                   </a>
                 )}
-                {!nextExercise && completed > 0 && nextCategory && (
-                  <Link
-                    href={`/rustlings/${nextCategory.slug}`}
-                    style={{
-                      display: "inline-flex", alignItems: "center", gap: "10px",
-                      background: C.greenSoft,
-                      border: `1px solid ${C.green}4d`,
-                      color: C.green,
-                      fontFamily: C.mono, fontSize: "11.5px", fontWeight: 600,
-                      borderRadius: "5px", padding: "8px 14px",
-                      textDecoration: "none",
-                    }}
-                    onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = `${C.green}33`; }}
-                    onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = C.greenSoft; }}
-                  >
-                    <Image src={ASSETS.rustlings.mascots.party} width={20} height={20} alt="" unoptimized />
-                    next · {nextCategory.name}
-                    <span style={{ opacity: 0.7 }}>→</span>
-                  </Link>
-                )}
-                {!nextExercise && completed > 0 && !nextCategory && (
-                  <span style={{ fontFamily: C.mono, fontSize: "11px", color: C.green }}>
-                    ✓ all exercises complete
-                  </span>
-                )}
               </div>
 
               {/* Progress card */}
@@ -244,6 +219,36 @@ export default function CategoryPage({
               {category.exercises.map((ex) => (
                 <ExerciseCard key={ex.id} exercise={ex} onCompleted={() => load(false)} />
               ))}
+
+              {!nextExercise && completed > 0 && (
+                <div style={{ background: C.surface2, borderTop: `1px solid ${C.border}`, padding: "16px" }}>
+                  {nextCategory ? (
+                    <Link
+                      href={`/rustlings/${nextCategory.slug}`}
+                      style={{
+                        display: "inline-flex", alignItems: "center", justifyContent: "center", gap: "10px",
+                        width: "100%",
+                        background: C.greenSoft,
+                        border: `1px solid ${C.green}4d`,
+                        color: C.green,
+                        fontFamily: C.mono, fontSize: "11.5px", fontWeight: 600,
+                        borderRadius: "5px", padding: "10px 14px",
+                        textDecoration: "none",
+                      }}
+                      onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = `${C.green}33`; }}
+                      onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = C.greenSoft; }}
+                    >
+                      <Image src={ASSETS.rustlings.mascots.party} width={20} height={20} alt="" unoptimized />
+                      next · {nextCategory.name}
+                      <span style={{ opacity: 0.7 }}>→</span>
+                    </Link>
+                  ) : (
+                    <div style={{ fontFamily: C.mono, fontSize: "11px", color: C.green, textAlign: "center" }}>
+                      ✓ all exercises complete
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         </div>
