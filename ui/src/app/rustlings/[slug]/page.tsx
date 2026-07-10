@@ -3,7 +3,7 @@ import { useState, useEffect, use } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { api, type CategoryDetail, type CategoryListItem } from "@/lib/api";
-import { ASSETS } from "@/lib/assets";
+import { ASSETS, MASCOT_SIZE } from "@/lib/assets";
 import Sidebar from "@/components/Sidebar";
 import ExerciseCard from "@/components/ExerciseCard";
 
@@ -87,13 +87,19 @@ export default function CategoryPage({
   ) ?? null;
 
   return (
-    <div className="flex min-h-screen" style={{ background: C.bg }}>
+    <div className="flex" style={{ background: C.bg, height: "100vh", overflow: "hidden" }}>
       <Sidebar />
 
       {/* Page: 2-column grid (content | right panel) */}
       <div
         className="flex-1 overflow-y-auto"
-        style={{ marginLeft: "44px", display: "grid", gridTemplateColumns: "1fr 280px", minHeight: "100vh" }}
+        style={{
+          marginLeft: "44px",
+          display: "grid",
+          gridTemplateColumns: "1fr 280px",
+          minHeight: 0,
+          overscrollBehavior: "contain",
+        }}
       >
         {/* ── Left column ── */}
         <div style={{ borderRight: `1px solid ${C.border}`, minWidth: 0 }}>
@@ -216,9 +222,11 @@ export default function CategoryPage({
               </div>
 
               {/* Exercise list */}
-              {category.exercises.map((ex) => (
-                <ExerciseCard key={ex.id} exercise={ex} onCompleted={() => load(false)} />
-              ))}
+              <div style={{ display: "flex", flexDirection: "column", gap: "16px", padding: "14px", background: C.bg }}>
+                {category.exercises.map((ex) => (
+                  <ExerciseCard key={ex.id} exercise={ex} onCompleted={() => load(false)} />
+                ))}
+              </div>
 
               {!nextExercise && completed > 0 && (
                 <div style={{ background: C.surface2, borderTop: `1px solid ${C.border}`, padding: "16px" }}>
@@ -238,8 +246,8 @@ export default function CategoryPage({
                       onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = `${C.green}33`; }}
                       onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = C.greenSoft; }}
                     >
-                      <Image src={ASSETS.rustlings.mascots.party} width={20} height={20} alt="" unoptimized />
-                      next · {nextCategory.name}
+                      <Image src={ASSETS.rustlings.mascots.time_up} width={MASCOT_SIZE} height={MASCOT_SIZE} alt="" unoptimized style={{ width: `${MASCOT_SIZE}px`, height: `${MASCOT_SIZE}px`, objectFit: "contain" }} />
+                      Next · {nextCategory.name}
                       <span style={{ opacity: 0.7 }}>→</span>
                     </Link>
                   ) : (

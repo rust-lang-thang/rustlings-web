@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { api, type CategoryListItem, type MeResponse } from "@/lib/api";
 import { isAuthenticated } from "@/lib/auth";
-import { ASSETS } from "@/lib/assets";
+import { ASSETS, MASCOT_SIZE } from "@/lib/assets";
 import Sidebar from "@/components/Sidebar";
 import CategoryCard from "@/components/CategoryCard";
 import FilterTabs, { type Filter } from "@/components/FilterTabs";
@@ -205,8 +205,9 @@ export default function RustlingsPage() {
                     <Image
                       src={ASSETS.rustlings.mascots.confuse}
                       alt="confused rust mascot"
-                      width={68}
-                      height={68}
+                      width={MASCOT_SIZE}
+                      height={MASCOT_SIZE}
+                      style={{ width: `${MASCOT_SIZE}px`, height: `${MASCOT_SIZE}px`, objectFit: "contain" }}
                     />
                     <div>
                       <div style={{ fontFamily: C.mono, fontSize: "11px", color: C.inkFaint }}>
@@ -278,8 +279,17 @@ export default function RustlingsPage() {
             continue where you left off
           </div>
           {categories.filter((c) => c.completed_exercises > 0 && c.completed_exercises < c.total_exercises).length === 0 ? (
-            <div style={{ fontFamily: C.mono, fontSize: "11px", color: C.inkFaint }}>
-              Complete your first exercise to start tracking.
+            <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+              <Image
+                src={ASSETS.rustlings.mascots.sleepy}
+                alt="sleepy rust mascot"
+                width={MASCOT_SIZE}
+                height={MASCOT_SIZE}
+                style={{ width: `${MASCOT_SIZE}px`, height: `${MASCOT_SIZE}px`, objectFit: "contain", flexShrink: 0 }}
+              />
+              <div style={{ fontFamily: C.mono, fontSize: "11px", color: C.inkFaint, lineHeight: 1.5 }}>
+                Complete your first exercise to start tracking.
+              </div>
             </div>
           ) : (
             <div style={{ display: "flex", flexDirection: "column", gap: "1px" }}>

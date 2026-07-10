@@ -18,9 +18,9 @@ export const metadata: Metadata = {
   title: "Rustlings (Web mode)",
   description: "Small exercises to get you used to reading and writing Rust",
   icons: {
-    icon: "/images/rustlings/mascots/disguised-rust.svg",
-    shortcut: "/images/rustlings/mascots/disguised-rust.svg",
-    apple: "/images/rustlings/mascots/disguised-rust.svg",
+    icon: "/images/rustlings/mascots/party-rust.svg",
+    shortcut: "/images/rustlings/mascots/party-rust.svg",
+    apple: "/images/rustlings/mascots/party-rust.svg",
   },
 };
 

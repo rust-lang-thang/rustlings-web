@@ -3,7 +3,7 @@ import { useState, useMemo } from "react";
 import Image from "next/image";
 import CodeEditor, { type DiagnosticMarker } from "./CodeEditor";
 import { api, type ExerciseWithProgress, type RunResponse } from "@/lib/api";
-import { ASSETS } from "@/lib/assets";
+import { ASSETS, MASCOT_SIZE } from "@/lib/assets";
 
 // ─── Rustc output parser ───────────────────────────────────────────────────────
 
@@ -126,7 +126,13 @@ export default function ExerciseCard({ exercise, onCompleted }: Props) {
   return (
     <div
       id={exercise.id}
-      style={{ borderBottom: `1px solid ${C.border}` }}
+      style={{
+        border: `1px solid ${completed ? "#7dd3a040" : C.border}`,
+        background: C.bg,
+        borderRadius: "8px",
+        scrollMarginTop: "24px",
+        overflow: "hidden",
+      }}
     >
       {/* Tab bar */}
       <div
@@ -208,7 +214,7 @@ export default function ExerciseCard({ exercise, onCompleted }: Props) {
       </div>
 
       {/* Code editor */}
-      <CodeEditor value={code} onChange={setCode} markers={diagnosticMarkers} />
+      <CodeEditor value={code} onChange={setCode} markers={diagnosticMarkers} height="380px" />
 
       {/* Status bar (mimics vb-statusbar) */}
       <div style={{
@@ -247,11 +253,12 @@ export default function ExerciseCard({ exercise, onCompleted }: Props) {
 
       {/* Hint panel */}
       {showHint && exercise.hint && (
-        <div style={{ borderTop: `1px solid ${C.noteBorder}`, background: C.noteBg }}>
+        <div style={{ borderTop: `1px solid ${C.noteBorder}`, background: C.noteBg, position: "relative", overflow: "hidden" }}>
+          <Image src={ASSETS.rustlings.mascots.confuse} alt="" width={MASCOT_SIZE} height={MASCOT_SIZE} style={{ position: "absolute", top: "8px", right: "12px", opacity: 0.9, pointerEvents: "none", width: `${MASCOT_SIZE}px`, height: `${MASCOT_SIZE}px`, objectFit: "contain" }} />
           <div style={{ padding: "10px 14px 4px", fontFamily: C.mono, fontSize: "9.5px", letterSpacing: ".16em", textTransform: "uppercase", color: C.accent }}>
             hint
           </div>
-          <pre style={{ padding: "0 14px 12px", fontSize: "12px", color: C.inkDim, fontFamily: C.mono, whiteSpace: "pre-wrap", margin: 0, userSelect: "text" }}>
+          <pre style={{ padding: `0 ${MASCOT_SIZE + 22}px 12px 14px`, fontSize: "12px", color: C.inkDim, fontFamily: C.mono, whiteSpace: "pre-wrap", margin: 0, userSelect: "text" }}>
             {exercise.hint}
           </pre>
         </div>
@@ -259,14 +266,15 @@ export default function ExerciseCard({ exercise, onCompleted }: Props) {
 
       {/* Solution panel */}
       {showSolution && (
-        <div style={{ borderTop: `1px solid ${C.noteBorder}`, background: C.noteBg }}>
+        <div style={{ borderTop: `1px solid ${C.noteBorder}`, background: C.noteBg, position: "relative", overflow: "hidden" }}>
+          <Image src={ASSETS.rustlings.mascots.smile} alt="" width={MASCOT_SIZE} height={MASCOT_SIZE} style={{ position: "absolute", top: "8px", right: "12px", opacity: 0.9, pointerEvents: "none", width: `${MASCOT_SIZE}px`, height: `${MASCOT_SIZE}px`, objectFit: "contain" }} />
           <div style={{ padding: "10px 14px 4px", fontFamily: C.mono, fontSize: "9.5px", letterSpacing: ".16em", textTransform: "uppercase", color: C.accent }}>
             solution
           </div>
           {exercise.solution ? (
             <pre style={{
               margin: 0,
-              padding: "0 14px 14px",
+              padding: `0 ${MASCOT_SIZE + 22}px 14px 14px`,
               maxHeight: "320px",
               overflow: "auto",
               fontFamily: C.mono,
@@ -286,6 +294,15 @@ export default function ExerciseCard({ exercise, onCompleted }: Props) {
         </div>
       )}
 
+      {running && (
+        <div style={{ borderTop: `1px solid ${C.border}`, background: C.surface2, display: "flex", alignItems: "center", justifyContent: "center", gap: "10px", padding: "10px 14px" }}>
+          <Image src={ASSETS.rustlings.mascots.time_up} alt="time up rust mascot" width={MASCOT_SIZE} height={MASCOT_SIZE} style={{ width: `${MASCOT_SIZE}px`, height: `${MASCOT_SIZE}px`, objectFit: "contain" }} />
+          <span style={{ fontFamily: C.mono, fontSize: "11px", color: C.inkDim, letterSpacing: ".08em" }}>
+            checking your code...
+          </span>
+        </div>
+      )}
+
       {/* Output terminal */}
       {output && (
         <div style={{ borderTop: `1px solid ${C.border}`, background: C.codeBg }}>
@@ -297,7 +314,7 @@ export default function ExerciseCard({ exercise, onCompleted }: Props) {
             {/* Pleading mascot on failure */}
             {!output.success && (
               <div style={{ marginLeft: "auto", flexShrink: 0 }}>
-                <Image src={ASSETS.rustlings.mascots.pleading} alt="pleading rust" width={36} height={36} />
+                <Image src={ASSETS.rustlings.mascots.pleading} alt="pleading rust" width={MASCOT_SIZE} height={MASCOT_SIZE} style={{ width: `${MASCOT_SIZE}px`, height: `${MASCOT_SIZE}px`, objectFit: "contain" }} />
               </div>
             )}
           </div>
@@ -328,11 +345,10 @@ export default function ExerciseCard({ exercise, onCompleted }: Props) {
           gap: "10px",
           padding: "10px 14px",
         }}>
-          <Image src={ASSETS.rustlings.mascots.party} alt="party rust" width={48} height={48} />
+          <Image src={ASSETS.rustlings.mascots.party} alt="party rust" width={MASCOT_SIZE} height={MASCOT_SIZE} style={{ width: `${MASCOT_SIZE}px`, height: `${MASCOT_SIZE}px`, objectFit: "contain" }} />
           <span style={{ fontFamily: C.mono, fontSize: "11px", color: C.green, letterSpacing: ".08em" }}>
-            exercise completed!
+            Exercise completed!
           </span>
-          <Image src={ASSETS.rustlings.mascots.party} alt="party rust" width={48} height={48} style={{ transform: "scaleX(-1)" }} />
         </div>
       )}
     </div>

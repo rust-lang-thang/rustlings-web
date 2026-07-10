@@ -357,7 +357,13 @@ export default function CodeEditor({
   const handleMount = useCallback((editor: any, monaco: any) => {
     editorRef.current = editor;
     monacoRef.current = monaco;
-  }, []);
+
+    editor.addCommand(monaco.KeyCode.Space, () => {
+      if (!readOnly) {
+        editor.trigger("keyboard", "type", { text: " " });
+      }
+    });
+  }, [readOnly]);
 
   const handleChange = useCallback((v: string | undefined) => {
     const nextValue = v ?? "";
@@ -405,7 +411,14 @@ export default function CodeEditor({
   }, [markers]);
 
   return (
-    <div style={{ overscrollBehavior: "contain" }}>
+    <div
+      style={{ overscrollBehavior: "contain" }}
+      onKeyDown={(e) => {
+        if (e.key === " ") e.preventDefault();
+        e.stopPropagation();
+      }}
+      onWheel={(e) => { e.stopPropagation(); }}
+    >
     <MonacoEditor
       height={height}
       language="rust"

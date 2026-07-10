@@ -3,7 +3,7 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import type { CategoryListItem } from "@/lib/api";
-import { ASSETS } from "@/lib/assets";
+import { ASSETS, MASCOT_SIZE } from "@/lib/assets";
 
 // Production palette
 const C = {
@@ -70,7 +70,7 @@ export default function CategoryCard({ category }: Props) {
           opacity: 0.92,
           transition: "opacity .15s",
         }}>
-          <Image src={ASSETS.rustlings.mascots.disguised} alt="disguised rust" width={56} height={56} />
+          <Image src={ASSETS.rustlings.mascots.disguised} alt="disguised rust" width={MASCOT_SIZE} height={MASCOT_SIZE} style={{ width: `${MASCOT_SIZE}px`, height: `${MASCOT_SIZE}px`, objectFit: "contain" }} />
         </div>
       )}
 
