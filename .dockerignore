@@ -1,4 +1,3 @@
-# flyctl launch added from .gitignore
 # Rust / Cargo
 **/target
 
@@ -23,7 +22,6 @@
 # Agent state
 **/.omc
 
-# flyctl launch added from .idea/.gitignore
 # Default ignored files
 .idea/shelf
 .idea/workspace.xml
@@ -35,11 +33,8 @@
 .idea/dataSources
 .idea/dataSources.local.xml
 
-# flyctl launch added from api/.gitignore
 api/target
 api/rustlings.db
 api/seed.sql
 
-# flyctl launch added from ui/.gitignore
 ui/.next
-fly.toml

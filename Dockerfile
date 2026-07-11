@@ -60,7 +60,7 @@ RUN mkdir -p /tmp/warmup/src && \
 ENV DATABASE_URL=sqlite:/data/rustlings.db
 # API_BASE_URL is used by Next.js rewrites to reach the Rust API internally
 ENV API_BASE_URL=http://localhost:3000
-# Next.js standalone listens on this port (Fly.io exposes 8080)
+# Next.js standalone listens on this port in the runtime container.
 ENV PORT=8080
 ENV HOSTNAME=0.0.0.0
 

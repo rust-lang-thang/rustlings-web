@@ -7,6 +7,13 @@
   ],
   "scripts": {
     "dev:ui": "npm run dev --workspace=ui",
-    "build:ui": "npm run build --workspace=ui"
+    "build:ui": "npm run build --workspace=ui",
+    "deploy": "wrangler deploy"
+  },
+  "dependencies": {
+    "@cloudflare/containers": "^0.3.7"
+  },
+  "devDependencies": {
+    "wrangler": "^4.110.0"
   }
 }
